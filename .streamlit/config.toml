@@ -1,0 +1,2 @@
+[server]
+maxUploadSize = 500  # Max file upload size in MB (adjust as needed)
