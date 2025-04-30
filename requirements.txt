@@ -1,8 +1,8 @@
 streamlit
-pycaret==3.2.0
-scikit-learn
 pandas
 matplotlib
 seaborn
 openpyxl
-numpy
+scikit-learn
+scipy==1.10.1
+pycaret==3.0.1
