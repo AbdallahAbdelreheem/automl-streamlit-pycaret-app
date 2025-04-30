@@ -1,8 +1,8 @@
-streamlit
-pandas
-matplotlib
-seaborn
-openpyxl
-scikit-learn
-scipy==1.11.4
-pycaret==3.0.1
+streamlit==1.28.0
+pandas==2.0.3
+numpy==1.24.3
+scikit-learn==1.3.0
+matplotlib==3.7.2
+seaborn==0.12.2
+lightgbm==3.3.5
+pycaret==3.0.4 --no-deps  # أهم تعديل: منع تثبيت تبعيات PyCaret تلقائيًا
