@@ -1,8 +1,10 @@
 streamlit==1.28.0
+scikit-learn==1.2.2
 pandas==1.5.3
 numpy==1.23.5
-scikit-learn==1.2.2  
+scipy==1.9.3
 matplotlib==3.7.2
 seaborn==0.12.2
-scipy==1.9.3
+joblib==1.2.0
+plotly==5.13.1
 pycaret==3.0.4
