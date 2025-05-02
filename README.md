@@ -21,6 +21,30 @@ It allows you to upload a dataset, preprocess it, train classification models au
 
 ---
 
+## 🖼️ App Walkthrough
+
+### 1. Upload & Preview Data  
+![Upload & Preview](Upload%20&%20Preview.png)  
+*This step allows users to upload their dataset and preview the first few rows for a quick glance at the data.*
+
+### 2. Preprocessing  
+![Preprocessing](Preprocessing.png)  
+*In this step, the target variable is selected, and necessary preprocessing steps like handling missing values, encoding categorical variables, and scaling features are performed.*
+
+### 3. Model Training  
+![Train](Train.png)  
+*This step trains the model using the preprocessed data and selected features.*
+
+### 4. Evaluation Metrics  
+![Evaluation Metrics](Evaluation%20metrics.png)  
+*This section displays various evaluation metrics like accuracy, precision, recall, and F1-score to assess the model's performance.*
+
+### 5. Feature Visualization  
+![Feature Visualization](Feature%20Visualization.png)  
+*Here, the features of the dataset are visualized to identify patterns, correlations, and outliers in the data.*
+
+---
+
 ## 🌐 Live Demo
 
 Try the app online (note: performance may vary):  
