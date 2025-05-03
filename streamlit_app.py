@@ -1,10 +1,11 @@
 import streamlit as st
 import pandas as pd
-from pycaret.classification import ClassificationExperiment
 from sklearn.preprocessing import LabelEncoder
 import pickle
 import matplotlib.pyplot as plt
 import seaborn as sns
+from pycaret.classification import ClassificationExperiment
+from pycaret.regression import RegressionExperiment
 
 # Set Streamlit page configuration
 st.set_page_config(page_title="AutoML App", layout="wide")
@@ -13,7 +14,7 @@ st.title("📊 AutoML Web App using PyCaret")
 # Sidebar Info
 with st.sidebar:
     st.header("App Navigation")
-    st.markdown("This app allows you to upload a dataset, handle missing values, encode categorical variables, and train classification models using PyCaret.")
+    st.markdown("This app allows you to upload a dataset, handle missing values, encode categorical variables, drop columns, and train models using PyCaret.")
 
 # Tabs for better navigation
 tabs = st.tabs(["Upload & Preview", "Preprocessing", "Train & Evaluate", "Feature Visualization"])
@@ -30,7 +31,6 @@ with tabs[0]:
         elif file_name.endswith(".xlsx"):
             df = pd.read_excel(uploaded_file)
 
-        # Clean column names
         df.columns = df.columns.str.replace(' ', '_').str.strip().str.lower()
 
         st.success("Dataset loaded successfully!")
@@ -38,13 +38,20 @@ with tabs[0]:
         st.dataframe(df.head(50), use_container_width=True)
         st.session_state.df = df
 
-# Step 2: Handle Missing Values and Encoding
+# Step 2: Handle Missing Values, Drop Columns, and Encoding
 with tabs[1]:
     st.header("2. Data Preprocessing")
 
     if "df" in st.session_state:
         df = st.session_state.df.copy()
 
+        # Drop columns
+        st.subheader("Drop Unwanted Columns")
+        columns_to_drop = st.multiselect("Select columns to drop:", df.columns)
+        if columns_to_drop:
+            df.drop(columns=columns_to_drop, inplace=True)
+
+        # Missing value imputation
         st.subheader("Missing Value Imputation")
         imputation_options = {}
         for col in df.columns:
@@ -59,13 +66,14 @@ with tabs[1]:
         for col, method in imputation_options.items():
             if method == "Mean":
                 df[col].fillna(df[col].mean(), inplace=True)
-            elif method == "Mode" or method == "Most Frequent":
+            elif method in ["Mode", "Most Frequent"]:
                 df[col].fillna(df[col].mode()[0], inplace=True)
             elif method == "New Category":
                 df[col].fillna("Missing", inplace=True)
 
         st.success("Missing values handled successfully!")
 
+        # Categorical Encoding
         st.subheader("Categorical Encoding")
         encoding_method = st.radio("Choose encoding method:", ["Label Encoding", "One-Hot Encoding"])
         df_encoded = df.copy()
@@ -79,40 +87,51 @@ with tabs[1]:
 
         st.success("Encoding completed successfully!")
 
+        # Select Target
         st.subheader("Select Target Variable")
         target = st.selectbox("Choose the target column (Y):", df_encoded.columns)
 
         if target:
+            task_type = "regression" if pd.api.types.is_numeric_dtype(df_encoded[target]) and df_encoded[target].nunique() > 10 else "classification"
             st.session_state.df_encoded = df_encoded
             st.session_state.target = target
-            st.write("Data ready for model training ✅")
+            st.session_state.task_type = task_type
+            st.success(f"Data ready for {task_type} task ✅")
 
-# Step 3: Train and Compare Models (Fixed Version)
+# Step 3: Train and Compare Models
 with tabs[2]:
     st.header("3. Model Training")
 
-    if "df_encoded" in st.session_state and "target" in st.session_state:
+    if all(k in st.session_state for k in ["df_encoded", "target", "task_type"]):
         df_encoded = st.session_state.df_encoded
         target = st.session_state.target
+        task_type = st.session_state.task_type
 
         if "best_model" not in st.session_state:
             if st.button("Start Training"):
                 with st.spinner("Training in progress..."):
                     try:
-                        exp = ClassificationExperiment()
+                        if task_type == "classification":
+                            exp = ClassificationExperiment()
+                        else:
+                            exp = RegressionExperiment()
+
                         exp.setup(
-                            data=df_encoded, 
-                            target=target, 
-                            use_gpu=False, 
-                            verbose=False, 
+                            data=df_encoded,
+                            target=target,
+                            use_gpu=False,
+                            verbose=False,
                             profile=False,
-                            session_id=42  # For reproducibility
+                            session_id=42
                         )
+
                         best_model = exp.compare_models()
                         results = exp.pull()
+
                         st.session_state.best_model = best_model
                         st.session_state.results = results
                         st.session_state.exp = exp
+
                         st.success("Training completed ✅")
                         st.toast("Best model trained successfully!", icon="🎉")
                     except Exception as e:
@@ -138,31 +157,30 @@ with tabs[2]:
             st.subheader("Model Evaluation Metrics")
             if st.session_state.exp and st.session_state.best_model:
                 try:
-                    # Create tabs for different evaluation plots
-                    eval_tabs = st.tabs(["Confusion Matrix", "AUC Curve", "Feature Importance"])
-                    
+                    eval_tabs = st.tabs(["Confusion Matrix" if task_type == "classification" else "Residuals Plot", "AUC Curve" if task_type == "classification" else "Prediction Error", "Feature Importance"])
+
                     with eval_tabs[0]:
-                        st.write("### Confusion Matrix")
+                        st.write("### Confusion Matrix" if task_type == "classification" else "### Residuals Plot")
                         plot = st.session_state.exp.plot_model(
                             st.session_state.best_model,
-                            plot="confusion_matrix",
+                            plot="confusion_matrix" if task_type == "classification" else "residuals",
                             display_format="streamlit"
                         )
                         if isinstance(plot, plt.Figure):
                             st.pyplot(plot)
                             plt.close(plot)
-                    
+
                     with eval_tabs[1]:
-                        st.write("### AUC-ROC Curve")
+                        st.write("### AUC-ROC Curve" if task_type == "classification" else "### Prediction Error")
                         plot = st.session_state.exp.plot_model(
                             st.session_state.best_model,
-                            plot="auc",
+                            plot="auc" if task_type == "classification" else "error",
                             display_format="streamlit"
                         )
                         if isinstance(plot, plt.Figure):
                             st.pyplot(plot)
                             plt.close(plot)
-                    
+
                     with eval_tabs[2]:
                         st.write("### Feature Importance")
                         try:
@@ -178,11 +196,9 @@ with tabs[2]:
                                 st.warning("Feature importance plot not available for this model type")
                         except Exception as e:
                             st.error(f"Could not generate feature importance: {str(e)}")
-                            
                 except Exception as e:
                     st.error(f"Evaluation error: {str(e)}")
                     st.warning("Some plots may not be available for this model type")
-
     else:
         st.warning("Please complete the previous steps to train the model.")
 
