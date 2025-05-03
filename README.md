@@ -1,7 +1,7 @@
 # ⚡ AutoML Streamlit App using PyCaret
 
 A no-code machine learning web app built using **PyCaret** and **Streamlit**.  
-It allows you to upload a dataset, preprocess it, train classification models automatically, and visualize the results — all in a few clicks!
+It allows you to upload a dataset, preprocess it, select the task type (Classification or Regression), train models automatically, and visualize the results — all in a few clicks!
 
 ---
 
@@ -9,12 +9,14 @@ It allows you to upload a dataset, preprocess it, train classification models au
 
 - 📁 Upload CSV or Excel datasets
 - 🧹 Handle missing values automatically
+- 🧯 Drop unwanted columns
 - 🔤 Encode categorical variables
-- 🎯 Select target column for classification
+- 🎯 Select target column
+- ⚡ Choose task type: **Classification** or **Regression**
 - ⚙️ Train and compare multiple models using PyCaret
 - 📈 View performance metrics:
-  - Confusion Matrix
-  - AUC-ROC Curve
+  - Confusion Matrix (for classification)
+  - AUC-ROC Curve (for classification)
   - Feature Importance
 - 💾 Download model comparison results
 - ✅ Save the best-performing model as `.pkl`
@@ -25,23 +27,23 @@ It allows you to upload a dataset, preprocess it, train classification models au
 
 ### 1. Upload & Preview Data  
 ![Upload & Preview](images/Upload&Preview.png)  
-*This step allows users to upload their dataset and preview the first few rows for a quick glance at the data.*
+*Upload your dataset and preview the data.*
 
 ### 2. Preprocessing  
 ![Preprocessing](images/Preprocessing.png)  
-*In this step, the target variable is selected, and necessary preprocessing steps like handling missing values, encoding categorical variables, and scaling features are performed.*
+*Drop columns, handle missing values, encode categorical variables, and select the task type and target variable.*
 
 ### 3. Model Training  
 ![Train](images/Train.png)  
-*This step trains the model using the preprocessed data and selected features.*
+*Train and compare models using PyCaret.*
 
 ### 4. Evaluation Metrics  
 ![Evaluation Metrics](images/Evaluation-metrics.png)  
-*This section displays various evaluation metrics like accuracy, precision, recall, and F1-score to assess the model's performance.*
+*View evaluation metrics based on the selected task type.*
 
 ### 5. Feature Visualization  
 ![Feature Visualization](images/Feature-Visualization.png)  
-*Here, the features of the dataset are visualized to identify patterns, correlations, and outliers in the data.*
+*Visualize feature distributions to gain insights.*
 
 ---
 
@@ -54,18 +56,18 @@ Try the app online (note: performance may vary):
 
 ## ⚠️ Performance Note
 
-Due to limited resources on **Streamlit Cloud**, the training process might be **slow or timeout** for large datasets.
+Due to limited resources on **Streamlit Cloud**, training may be **slow or timeout** for large datasets.
 
 💡 **Recommended:**  
-Clone the repository and run the app locally in your virtual environment for best performance.
+Clone the repository and run the app locally in your virtual environment for optimal performance.
 
 ---
 
 ## 🛠 Tech Stack
 
-- Python 3.10
+- Python 3.10+
 - PyCaret 3.0.4
-- Streamlit 1.28
+- Streamlit 1.28+
 - Pandas, Scikit-learn, Matplotlib, Seaborn
 
 ---
